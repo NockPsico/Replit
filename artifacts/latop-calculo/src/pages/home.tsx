@@ -52,7 +52,9 @@ export default function Home() {
     }
 
     const bandDec = hmsToDecimal(bandRaw);
-    const B = vaoN * Math.tan((bandDec * Math.PI) / 180) - altN;
+    // line 6 (missing from listing) pushed 90; line 9 "-" does 90 - BAND_dec
+    // TAN(90 - BAND_dec) = COT(BAND_dec) = 1 / TAN(BAND_dec)
+    const B = vaoN / Math.tan((bandDec * Math.PI) / 180) - altN;
     const num = 4 * Math.sqrt(Math.max(0, flexaN * altN)) + B - 4 * flexaN;
     const ang = 90 - (Math.atan(num / vaoN) * 180) / Math.PI;
 
