@@ -26,33 +26,39 @@ export default defineConfig({
     runtimeErrorOverlay(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "pwa-192x192.svg", "pwa-512x512.svg"],
+      includeAssets: ["logo.jpg", "logo-nobg.png"],
       manifest: {
         name: "Latop Cálculo",
         short_name: "Latop",
         description: "Calculadora de ângulo para topografia",
-        theme_color: "#000814",
-        background_color: "#000814",
+        theme_color: "#0d2248",
+        background_color: "#0d2248",
         display: "standalone",
         orientation: "portrait",
         start_url: basePath,
         scope: basePath,
         icons: [
           {
-            src: "pwa-192x192.svg",
+            src: "logo.jpg",
             sizes: "192x192",
-            type: "image/svg+xml",
+            type: "image/jpeg",
           },
           {
-            src: "pwa-512x512.svg",
+            src: "logo.jpg",
             sizes: "512x512",
-            type: "image/svg+xml",
-            purpose: "any maskable",
+            type: "image/jpeg",
+            purpose: "any",
+          },
+          {
+            src: "logo-nobg.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,jpg,jpeg,woff2}"],
         navigateFallback: null,
       },
       devOptions: {
