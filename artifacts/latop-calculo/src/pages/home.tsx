@@ -52,11 +52,14 @@ export default function Home() {
     }
 
     const bandDec = hmsToDecimal(bandRaw);
-    const B = vaoN * Math.tan((bandDec * Math.PI) / 180) - altN;
-    const num = 4 * Math.sqrt(Math.max(0, flexaN * altN)) + B - 4 * flexaN;
+    // HP lines 7-15: B = VAO × TAN(-BAND_dec) - ALT
+    const B = vaoN * Math.tan((-bandDec * Math.PI) / 180) - altN;
+    // HP lines 22-28: num = B + 4 - 4×FLEXA
+    const num = B + 4 - 4 * flexaN;
+    // HP lines 29-34: VISADA = 90 - ATAN(num / VAO)
     const ang = 90 - (Math.atan(num / vaoN) * 180) / Math.PI;
 
-    if (ang < 0 || ang > 90) {
+    if (ang < 0 || ang > 180) {
       setResult("FORA PADRÃO");
       setResultDec("");
       setStatus("error");
