@@ -1,13 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 
-function hmsToDecimal(hms: number): number {
-  const deg = Math.floor(hms);
-  const rest = (hms - deg) * 100;
-  const min = Math.floor(rest);
-  const sec = (rest - min) * 100;
-  return deg + min / 60 + sec / 3600;
-}
-
 function decimalToHms(dec: number): string {
   const deg = Math.floor(dec);
   const minFull = (dec - deg) * 60;
@@ -16,8 +8,13 @@ function decimalToHms(dec: number): string {
   return `${deg}°${String(min).padStart(2, "0")}'${sec.toFixed(1)}″`;
 }
 
+const inputClass =
+  "w-full px-5 py-5 text-lg rounded-xl border-none outline-none bg-[#10243f] text-white placeholder-[#556070] focus:ring-2 focus:ring-[#ffd60a]/50 transition";
+
 export default function Home() {
-  const [band, setBand] = useState("");
+  const [bandDeg, setBandDeg] = useState("");
+  const [bandMin, setBandMin] = useState("");
+  const [bandSec, setBandSec] = useState("");
   const [vao, setVao] = useState("");
   const [alt, setAlt] = useState("");
   const [flexa, setFlexa] = useState("");
@@ -26,27 +23,28 @@ export default function Home() {
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
 
   const calcular = useCallback(() => {
-    const bandRaw = parseFloat(band);
+    const bandDegN = parseFloat(bandDeg);
+    const bandMinN = parseFloat(bandMin || "0");
+    const bandSecN = parseFloat(bandSec || "0");
     const vaoN = parseFloat(vao);
     const altN = parseFloat(alt);
     const flexaN = parseFloat(flexa);
 
-    if ([bandRaw, vaoN, altN, flexaN].some(isNaN)) {
-      if ([band, vao, alt, flexa].some((v) => v !== "")) {
-        setResult("ERRO");
-        setResultDec("");
-        setStatus("error");
-      } else {
+    const allEmpty = [bandDeg, vao, alt, flexa].every((v) => v === "");
+    if (isNaN(bandDegN) || isNaN(vaoN) || isNaN(altN) || isNaN(flexaN)) {
+      if (allEmpty) {
         setResult("···");
         setResultDec("");
         setStatus("idle");
+      } else {
+        setResult("ERRO");
+        setResultDec("");
+        setStatus("error");
       }
       return;
     }
 
-    const bandDec = hmsToDecimal(bandRaw);
-    // line 6 (missing from listing) pushed 90; line 9 "-" does 90 - BAND_dec
-    // TAN(90 - BAND_dec) = COT(BAND_dec) = 1 / TAN(BAND_dec)
+    const bandDec = bandDegN + bandMinN / 60 + bandSecN / 3600;
     const B = vaoN / Math.tan((bandDec * Math.PI) / 180) - altN;
     const num = 4 * Math.sqrt(Math.max(0, flexaN * altN)) + B - 4 * flexaN;
     const ang = 90 - (Math.atan(num / vaoN) * 180) / Math.PI;
@@ -63,7 +61,7 @@ export default function Home() {
     setStatus("ok");
 
     if (navigator.vibrate) navigator.vibrate(30);
-  }, [band, vao, alt, flexa]);
+  }, [bandDeg, bandMin, bandSec, vao, alt, flexa]);
 
   useEffect(() => {
     calcular();
@@ -77,21 +75,54 @@ export default function Home() {
         </h1>
 
         <div className="flex flex-col gap-3">
-          <input
-            type="number"
-            inputMode="decimal"
-            value={band}
-            onChange={(e) => setBand(e.target.value)}
-            placeholder="BAND (ex: 1.30)"
-            className="w-full px-5 py-5 text-lg rounded-xl border-none outline-none bg-[#10243f] text-white placeholder-[#556070] focus:ring-2 focus:ring-[#ffd60a]/50 transition"
-          />
+          <div>
+            <p className="text-[#556070] text-xs font-semibold tracking-widest uppercase mb-1 pl-1">
+              BAND
+            </p>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={bandDeg}
+                  onChange={(e) => setBandDeg(e.target.value)}
+                  placeholder="°"
+                  className={inputClass}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ffd60a] font-bold pointer-events-none">°</span>
+              </div>
+              <div className="flex-1 relative">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={bandMin}
+                  onChange={(e) => setBandMin(e.target.value)}
+                  placeholder="'"
+                  className={inputClass}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ffd60a] font-bold pointer-events-none">'</span>
+              </div>
+              <div className="flex-1 relative">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  value={bandSec}
+                  onChange={(e) => setBandSec(e.target.value)}
+                  placeholder="″"
+                  className={inputClass}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ffd60a] font-bold pointer-events-none">″</span>
+              </div>
+            </div>
+          </div>
+
           <input
             type="number"
             inputMode="decimal"
             value={vao}
             onChange={(e) => setVao(e.target.value)}
             placeholder="VAO (m)"
-            className="w-full px-5 py-5 text-lg rounded-xl border-none outline-none bg-[#10243f] text-white placeholder-[#556070] focus:ring-2 focus:ring-[#ffd60a]/50 transition"
+            className={inputClass}
           />
           <input
             type="number"
@@ -99,7 +130,7 @@ export default function Home() {
             value={alt}
             onChange={(e) => setAlt(e.target.value)}
             placeholder="ALT (m)"
-            className="w-full px-5 py-5 text-lg rounded-xl border-none outline-none bg-[#10243f] text-white placeholder-[#556070] focus:ring-2 focus:ring-[#ffd60a]/50 transition"
+            className={inputClass}
           />
           <input
             type="number"
@@ -107,7 +138,7 @@ export default function Home() {
             value={flexa}
             onChange={(e) => setFlexa(e.target.value)}
             placeholder="FLEXA (m)"
-            className="w-full px-5 py-5 text-lg rounded-xl border-none outline-none bg-[#10243f] text-white placeholder-[#556070] focus:ring-2 focus:ring-[#ffd60a]/50 transition"
+            className={inputClass}
           />
 
           <button
