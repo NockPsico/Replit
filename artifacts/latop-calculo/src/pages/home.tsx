@@ -16,13 +16,6 @@ function decimalToHms(dec: number): string {
   return `${deg}°${String(min).padStart(2, "0")}'${sec.toFixed(1)}″`;
 }
 
-interface SavedValues {
-  bandRaw: string;
-  vao: string;
-  alt: string;
-  flexa: string;
-}
-
 export default function Home() {
   const [band, setBand] = useState("");
   const [vao, setVao] = useState("");
@@ -70,26 +63,7 @@ export default function Home() {
     setStatus("ok");
 
     if (navigator.vibrate) navigator.vibrate(30);
-
-    localStorage.setItem(
-      "latop_last",
-      JSON.stringify({ bandRaw: band, vao, alt, flexa })
-    );
   }, [band, vao, alt, flexa]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("latop_last");
-    if (saved) {
-      try {
-        const vals: SavedValues = JSON.parse(saved);
-        setBand(vals.bandRaw ?? "");
-        setVao(vals.vao ?? "");
-        setAlt(vals.alt ?? "");
-        setFlexa(vals.flexa ?? "");
-      } catch {
-      }
-    }
-  }, []);
 
   useEffect(() => {
     calcular();
