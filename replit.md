@@ -4,6 +4,10 @@
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
+## Artifacts
+
+- **latop-calculo** (`/`): LATOP angle calculator — frontend-only React app with dark navy/yellow theme. Converts BAND (DMS), VAO, ALT, FLEXA inputs into an angle in DMS format. Auto-calculates on input change and persists last values in localStorage.
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
