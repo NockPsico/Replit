@@ -71,7 +71,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#000814] flex items-start justify-center py-10 px-4">
       <div className="w-full max-w-[420px]">
         <div className="flex flex-col items-center mb-8">
-          <img src="/logo.jpg" alt="Latop" className="w-48 rounded-2xl" />
+          <img src="/logo-nobg.png" alt="Latop" className="w-56" />
         </div>
 
         <div className="flex flex-col gap-3">
